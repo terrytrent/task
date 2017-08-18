@@ -19,3 +19,5 @@ To list all the tasks, simply run `python task.py list`.
 
 Removal of tasks is done by the command `python task.py remove`. Task numbers are listed after `remove`.
 All tasks can be removed at once by running `python task.py remove all`.
+A "range" can also be specified for removing tasks. A range has the form `a..b` where `a` and `b` are both integers. `b` has to be greater than `a`.
+For example, `python task.py remove 3..7` removes the tasks 3 through 7.
