@@ -3,7 +3,7 @@ Basic command line to-do application.
 
 ## How does it work?
 
-Make sure `filename` is set to a file name that you would like to store the tasks in.
+Make sure the variable `filename` inside `task.py` is set to a file name that you would like to store the tasks in.
 
 ### Adding tasks
 
