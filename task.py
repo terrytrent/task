@@ -1,6 +1,5 @@
 import sys
 
-
 def main():
     filename = '' # tasks file that stores all the tasks
     if len(sys.argv) >= 2:
