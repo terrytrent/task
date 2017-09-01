@@ -43,7 +43,6 @@ def add_tasks(filename, tasks):
     output_file.close()
 
 def remove_tasks(filename, remove_args):
-    print(remove_args)
     if remove_args[0] == 'all':
         input_file = open(filename)
         tasks = input_file.read().split('\n')
