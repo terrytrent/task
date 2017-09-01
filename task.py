@@ -1,3 +1,7 @@
+"""
+A very basic command line application. It works by adding and removing tasks from
+a text file that is specified by the `filename` variable in the `main` function.
+"""
 import argparse
 import sys
 
@@ -23,6 +27,9 @@ def main():
         remove_tasks(filename, args.remove_args)
 
 def list_tasks(filename):
+    """
+    List all the tasks presently stored in `filename`.
+    """
     input_file = open(filename)
     tasks = input_file.read().split('\n')
     tasks.pop()
@@ -36,6 +43,9 @@ def list_tasks(filename):
             counter += 1
 
 def add_tasks(filename, tasks):
+    """
+    Add all the tasks that are stored in `tasks` into the tasks file.
+    """
     output_file = open(filename, 'a')
     for task in tasks:
         output_file.write(task + '\n')
@@ -43,6 +53,10 @@ def add_tasks(filename, tasks):
     output_file.close()
 
 def remove_tasks(filename, remove_args):
+    """
+    Removes tasks depending on what the --remove argument has received from the command line.
+    Removes either by task numbers or by a 'task range' that is of the format a..b
+    """
     if remove_args[0] == 'all':
         input_file = open(filename)
         tasks = input_file.read().split('\n')
