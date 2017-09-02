@@ -38,6 +38,6 @@ optional arguments:
                         tasks to be added separated by whitespace
   -r REMOVE_ARGS [REMOVE_ARGS ...], --remove REMOVE_ARGS [REMOVE_ARGS ...]
                         remove by listing individual task numbers followed by
-                        whitespace or a range which is of the format a..b
+                        separated or a range which is of the format a..b
                         where a and b are both integers
 ```
