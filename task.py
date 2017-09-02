@@ -14,7 +14,7 @@ def main():
     group.add_argument('-a', '--add', nargs='+',
                        help='tasks to be added separated by whitespace')
     group.add_argument('-r', '--remove', nargs='+', dest='remove_args',
-                       help='remove by listing individual task numbers followed ' +
+                       help='remove by listing individual task numbers separated ' +
                        'by whitespace or a range which is of the format a..b where '+
                        'a and b are both integers')
     args = parser.parse_args()
