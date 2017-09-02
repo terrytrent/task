@@ -37,7 +37,7 @@ optional arguments:
   -a ADD [ADD ...], --add ADD [ADD ...]
                         tasks to be added separated by whitespace
   -r REMOVE_ARGS [REMOVE_ARGS ...], --remove REMOVE_ARGS [REMOVE_ARGS ...]
-                        remove by listing individual task numbers followed by
-                        separated or a range which is of the format a..b
+                        remove by listing individual task numbers separated by
+                        whitespace or a range which is of the format a..b
                         where a and b are both integers
 ```
