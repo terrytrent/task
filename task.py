@@ -1,5 +1,6 @@
 """
-A very basic command line application. It works by adding and removing tasks from
+task.py
+A very basic to-do list command line application. It works by adding and removing tasks from
 a text file that is specified by the `filename` variable in the `main` function.
 """
 import argparse
