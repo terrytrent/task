@@ -1,7 +1,7 @@
 """
 task.py
 A very basic to-do list command line application. It works by adding and removing tasks from
-a text file that is specified by the `filename` variable in the `main` function.
+a database located under ~/.task/task.db.
 """
 from datetime import datetime
 from models import Base, tasks
@@ -12,6 +12,9 @@ from sqlalchemy.orm import sessionmaker
 
 
 def connect_db():
+    """
+    Creates the database, populates tables, and creates a DB connection.
+    """
     home_path = path.expanduser("~")
     app_path = path.join(home_path, '.task')
 
@@ -30,6 +33,9 @@ def connect_db():
 
 
 def main():
+    """
+    Returns help information and decides which function to call depending on arguments.
+    """
     parser = argparse.ArgumentParser(description='basic command line to-do application')
     group = parser.add_mutually_exclusive_group()
     group.add_argument('-l', '--list', action='store_true',
@@ -53,7 +59,7 @@ def main():
 
 def list_tasks():
     """
-    List all the tasks presently stored in `filename`.
+    List all the tasks presently stored in the database and are not marked for deletion.
     """
     all_tasks = session.query(tasks).filter_by(deleted_at=None).all()
 
@@ -67,7 +73,7 @@ def list_tasks():
 
 def add_task(task_items):
     """
-    Add all the tasks that are stored in `tasks` into the tasks file.
+    Add all the tasks that are stored in `tasks` into the database.
     """
     created_at = datetime.today()
     for task_item in task_items:
@@ -80,6 +86,7 @@ def add_task(task_items):
                                                                                                        task.task,
                                                                                                        task.created_at,
                                                                                                        task.modified_at)
+
 
 def remove_task(remove_args):
     """
