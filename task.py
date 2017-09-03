@@ -5,9 +5,18 @@ a text file that is specified by the `filename` variable in the `main` function.
 """
 import argparse
 import sys
+import os
 
 def main():
     filename = '' # tasks file that stores all the tasks
+
+    if not filename:
+        print("=> warning: please set the `filename` variable in `main` to a file you'd like to store your tasks in!")
+        return 1
+    elif not os.path.isfile(filename):
+        print("=> warning: invalid tasks filename {!r}".format(filename))
+        return 1
+
     parser = argparse.ArgumentParser(description='basic command line to-do application')
     group = parser.add_mutually_exclusive_group()
     group.add_argument('-l', '--list', action='store_true',
