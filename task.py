@@ -35,6 +35,8 @@ def main():
         add_tasks(filename, args.add)
     elif args.remove_args:
         remove_tasks(filename, args.remove_args)
+    else:
+        parser.print_help()
 
 def list_tasks(filename):
     """
