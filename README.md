@@ -7,7 +7,9 @@ Basic command line to-do list application.
 
 ## How does it work?
 
-Make sure the variable `filename` inside `task.py` is set to a file name that you would like to store the tasks in.
+The tasks are now stored in a database located in the users home folder under the subfolder '.task'.  For example:
+
+`/home/user/.task/tasks.db`
 
 ### Adding tasks
 
