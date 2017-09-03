@@ -3,20 +3,33 @@ task.py
 A very basic to-do list command line application. It works by adding and removing tasks from
 a text file that is specified by the `filename` variable in the `main` function.
 """
+from datetime import datetime
+from models import Base, tasks
 import argparse
-import sys
-import os
+from os import mkdir, path
+from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker
+
+
+def connect_db():
+    home_path = path.expanduser("~")
+    app_path = path.join(home_path, '.task')
+
+    if not path.exists(app_path):
+        mkdir(app_path)
+
+    sqlite_file = "sqlite:///{0}/task.db".format(app_path)
+    engine = create_engine(sqlite_file)
+
+    session = sessionmaker(bind=engine)
+
+    if not engine.dialect.has_table(engine, "tasks"):
+        Base.metadata.create_all(engine)
+
+    return session()
+
 
 def main():
-    filename = '' # tasks file that stores all the tasks
-
-    if not filename:
-        print("=> warning: please set the `filename` variable in `main` to a file you'd like to store your tasks in!")
-        return 1
-    elif not os.path.isfile(filename):
-        print("=> warning: invalid tasks filename {!r}".format(filename))
-        return 1
-
     parser = argparse.ArgumentParser(description='basic command line to-do application')
     group = parser.add_mutually_exclusive_group()
     group.add_argument('-l', '--list', action='store_true',
@@ -30,67 +43,73 @@ def main():
     args = parser.parse_args()
 
     if args.list:
-        list_tasks(filename)
+        list_tasks()
     elif args.add:
-        add_tasks(filename, args.add)
+        add_task(args.add)
     elif args.remove_args:
-        remove_tasks(filename, args.remove_args)
+        remove_task(args.remove_args)
     else:
         parser.print_help()
 
-def list_tasks(filename):
+def list_tasks():
     """
     List all the tasks presently stored in `filename`.
     """
-    input_file = open(filename)
-    tasks = input_file.read().split('\n')
-    tasks.pop()
-    input_file.close()
-    if len(tasks) == 0:
-        print('=> no tasks')
-    else:
-        counter = 1
-        for task in tasks:
-            print('{} => {}'.format(counter, task))
-            counter += 1
+    all_tasks = session.query(tasks).filter_by(deleted_at=None).all()
 
-def add_tasks(filename, tasks):
+    if len(all_tasks) == 0:
+        print "=> no tasks"
+
+    else:
+        for task_number in range(0,len(all_tasks)):
+            print "{0} => {1}".format(task_number+1, all_tasks[task_number].task)
+
+
+def add_task(task_items):
     """
     Add all the tasks that are stored in `tasks` into the tasks file.
     """
-    output_file = open(filename, 'a')
-    for task in tasks:
-        output_file.write(task + '\n')
-        print('=> added task \'{}\''.format(task))
-    output_file.close()
+    created_at = datetime.today()
+    for task_item in task_items:
+        task = tasks(task=task_item, created_at=created_at, modified_at=created_at, deleted_at=None)
 
-def remove_tasks(filename, remove_args):
+        session.add(task)
+        session.commit()
+
+        print "Task Added: \n    ID: {0}\n    Task: {1}\n    Created At: {2}\n    Modified At: {3}".format(task.id,
+                                                                                                       task.task,
+                                                                                                       task.created_at,
+                                                                                                       task.modified_at)
+
+def remove_task(remove_args):
     """
     Removes tasks depending on what the --remove argument has received from the command line.
     Removes either by task numbers or by a 'task range' that is of the format a..b
     """
+    all_tasks = session.query(tasks).filter_by(deleted_at=None).all()
+
     if remove_args[0] == 'all':
-        input_file = open(filename)
-        tasks = input_file.read().split('\n')
-        tasks.pop()
-        input_file.close()
-        if len(tasks) == 0:
+        if len(all_tasks) == 0:
             print('=> no tasks to remove, already empty')
         else:
-            output_file = open(filename, 'w')
-            output_file.write('')
-            output_file.close()
+            for task_number in range(0, len(all_tasks)):
+                deleted_at = datetime.today()
+                task_to_delete_id = all_tasks[task_number].id
+                task_to_delete = session.query(tasks).filter_by(id=task_to_delete_id).first()
+                task_to_delete.deleted_at = deleted_at
+
+                session.add(task_to_delete)
+                session.commit()
             print('=> removed all tasks')
+
     else:
         if '..' in remove_args[0]:
-            unique_task_numbers = set()
             dot_start_i = remove_args[0].index('..')
             try:
                 start_num = int(remove_args[0][0:dot_start_i])
                 end_num = int(remove_args[0][dot_start_i+2:])
                 if end_num > start_num:
-                    unique_task_numbers = {str(x) for x in
-                        range(start_num, end_num + 1)}
+                    unique_task_numbers = {str(x) for x in range(start_num, end_num + 1)}
                 else:
                     print("=> warning: invalid range numbers")
                     print("=> end number must be greater than start number")
@@ -99,12 +118,9 @@ def remove_tasks(filename, remove_args):
                 print("=> warning: only integers allowed for range")
                 return 1
         else:
-            unique_task_numbers = set(remove_args[0:])
-        input_file = open(filename)
-        tasks = input_file.read().split('\n')
-        tasks.pop()
-        input_file.close()
-        if len(tasks) == 0:
+            unique_task_numbers = set(remove_args[0])
+
+        if len(all_tasks) == 0:
             print('=> no tasks to remove, already empty')
         else:
             for task_num_str in unique_task_numbers:
@@ -117,15 +133,20 @@ def remove_tasks(filename, remove_args):
                     print('=> warning: only positive task numbers allowed ({:d})'.format(task_num))
                     continue
                 try:
-                    tasks[task_num - 1] = None
+                    deleted_at = datetime.today()
+                    task_to_delete = session.query(tasks).filter_by(id=all_tasks[task_num - 1].id).first()
+                    task_to_delete.deleted_at = deleted_at
+
+                    session.add(task_to_delete)
+                    session.commit()
+
                     print('=> removed task {:d}'.format(task_num))
+
                 except IndexError:
                     print('=> invalid task number: {:d}'.format(task_num))
-            tasks = [task for task in tasks if task != None]
-            output_file = open(filename, 'w')
-            for task in tasks:
-                output_file.write(task + '\n')
-            output_file.close()
+
 
 if __name__ == '__main__':
+    session = connect_db()
+
     main()
