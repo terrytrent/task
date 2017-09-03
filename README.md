@@ -1,6 +1,10 @@
 # task
 Basic command line to-do list application.
 
+## Video guide
+
+[![asciicast](https://asciinema.org/a/136105.png)](https://asciinema.org/a/136105)
+
 ## How does it work?
 
 Make sure the variable `filename` inside `task.py` is set to a file name that you would like to store the tasks in.
