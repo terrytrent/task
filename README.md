@@ -1,5 +1,5 @@
 # task
-Basic command line to-do application.
+Basic command line to-do list application.
 
 ## How does it work?
 
